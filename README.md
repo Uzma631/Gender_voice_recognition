@@ -17,8 +17,10 @@ Training the Model: The model is trained using features extracted from audio fil
 3. **Dataset (Audio/)**
 **Purpose:** The dataset folder contains audio files labeled as male and female voices. These audio files are used to train and evaluate the gender prediction model.
 ## Folder Structure:
+* In audio file subfolders:
 Male/ – Contains audio files of male voices.
 Female/ – Contains audio files of female voices.
+* In GUI Screen-shot folder: working of the model to predict male or female voice
 4. **Feature Extraction (mfcc.m)**
 **Purpose:** This script extracts MFCC features from audio signals. The extracted features are used for gender classification.
 Method: MFCC is a widely-used feature extraction method in speech and audio processing. The mfcc.m function computes the MFCCs from the audio signal, which are then used by the SVM model for classification.
