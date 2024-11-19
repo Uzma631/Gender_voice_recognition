@@ -1,0 +1,62 @@
+% Paths to dataset
+maleFolder = 'D:\Matlab\audio\male/';
+femaleFolder = 'D:\Matlab\audio\female/';
+
+% Paths to dataset
+maleFolder = 'path_to_dataset/male/';
+femaleFolder = 'path_to_dataset/female/';
+
+% Load audio files
+maleFiles = dir(fullfile(maleFolder, '*.mp3'));
+femaleFiles = dir(fullfile(femaleFolder, '*.mp3'));
+
+% Initialize variables
+features = [];
+labels = [];
+
+% Process male audio files
+for i = 1:length(maleFiles)
+    try
+        [audio, fs] = audioread(fullfile(maleFolder, maleFiles(i).name));
+        audio = audio(abs(audio) > 0.01); % Remove silence
+        mfccFeatures = mfcc(audio, fs, 'NumCoeffs', 13);
+        if ~isempty(mfccFeatures)
+            features = [features; mean(mfccFeatures, 1)]; % Append mean MFCCs
+            labels = [labels; 1]; % Male label
+        end
+    catch ME
+        warning('Error processing %s: %s', maleFiles(i).name, ME.message);
+    end
+end
+
+% Process female audio files
+for i = 1:length(femaleFiles)
+    try
+        [audio, fs] = audioread(fullfile(femaleFolder, femaleFiles(i).name));
+        audio = audio(abs(audio) > 0.01); % Remove silence
+        mfccFeatures = mfcc(audio, fs, 'NumCoeffs', 13);
+        if ~isempty(mfccFeatures)
+            features = [features; mean(mfccFeatures, 1)]; % Append mean MFCCs
+            labels = [labels; 0]; % Female label
+        end
+    catch ME
+        warning('Error processing %s: %s', femaleFiles(i).name, ME.message);
+    end
+end
+
+% Verify features and labels
+disp('Feature matrix size:');
+disp(size(features));
+disp('Labels size:');
+disp(size(labels));
+
+% Train SVM Classifier
+if isempty(features) || isempty(labels)
+    error('Feature matrix or labels are empty. Ensure audio files are correctly processed.');
+end
+
+svmModel = fitcsvm(features, labels, 'KernelFunction', 'linear');
+
+% Save the trained model
+save('gender_svm_model.mat', 'svmModel');
+disp('Model training complete and saved as gender_svm_model.mat');
